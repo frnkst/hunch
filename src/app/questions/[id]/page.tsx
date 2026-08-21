@@ -44,7 +44,9 @@ export default async function QuestionPage({
   const mayManage =
     question.creator_id === membership.user.id || membership.profile.is_admin;
   const mayEditSettings =
-    question.creator_id === membership.user.id && question.status === "open";
+    membership.profile.is_admin ||
+    (question.creator_id === membership.user.id && question.status === "open");
+  const mayCancel = mayManage && question.status === "open";
   const mayResolve =
     (mayManage && question.status === "open" && deadlinePassed) ||
     (membership.profile.is_admin && question.status === "resolved");
@@ -216,16 +218,21 @@ export default async function QuestionPage({
           {mayEditSettings ? (
             <section className="glass-panel rounded-[1.8rem] p-5">
               <h2 className="mb-3 font-extrabold">Question settings</h2>
-              <QuestionSettingsForm question={question} />
-              <form action={cancelQuestion} className="mt-3">
-                <input type="hidden" name="questionId" value={question.id} />
-                <button
-                  type="submit"
-                  className="w-full rounded-xl px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50"
-                >
-                  Cancel question
-                </button>
-              </form>
+              <QuestionSettingsForm
+                question={question}
+                isAdmin={membership.profile.is_admin}
+              />
+              {mayCancel ? (
+                <form action={cancelQuestion} className="mt-3">
+                  <input type="hidden" name="questionId" value={question.id} />
+                  <button
+                    type="submit"
+                    className="w-full rounded-xl px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50"
+                  >
+                    Cancel question
+                  </button>
+                </form>
+              ) : null}
             </section>
           ) : null}
         </aside>

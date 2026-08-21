@@ -325,10 +325,13 @@ export async function updateQuestionSettings(formData: FormData) {
     .eq("id", questionId)
     .maybeSingle();
   if (!data) fail(path, "Question not found.");
-  if (data.creator_id !== membership.user.id) {
-    fail(path, "Only the creator can change these settings.");
+  const isAdmin = membership.profile.is_admin;
+  if (data.creator_id !== membership.user.id && !isAdmin) {
+    fail(path, "Only the creator or admin can change these settings.");
   }
-  if (data.status !== "open") fail(path, "This question is already closed.");
+  if (!isAdmin && data.status !== "open") {
+    fail(path, "This question is already closed.");
+  }
   if (!visibilityModes.includes(visibility)) {
     fail(path, "Choose a valid visibility.");
   }
@@ -342,17 +345,53 @@ export async function updateQuestionSettings(formData: FormData) {
   } catch (error) {
     fail(path, error instanceof Error ? error.message : "Invalid deadline.");
   }
-  if (deadline < new Date(data.deadline)) {
+  if (!isAdmin && deadline < new Date(data.deadline)) {
     fail(path, "The deadline can only be extended.");
+  }
+
+  const updates: {
+    deadline: string;
+    visibility: VisibilityMode;
+    text?: string;
+  } = {
+    deadline: deadline.toISOString(),
+    visibility,
+  };
+  if (isAdmin) {
+    const text = String(formData.get("text") ?? "").trim();
+    if (text.length < 3 || text.length > 300) {
+      fail(path, "Question must be between 3 and 300 characters.");
+    }
+    updates.text = text;
   }
 
   const { error } = await admin
     .from("questions")
-    .update({ deadline: deadline.toISOString(), visibility })
+    .update(updates)
     .eq("id", questionId);
   if (error) fail(path, error.message);
+  revalidatePath("/");
   revalidatePath(path);
   redirect(`${path}?updated=1`);
+}
+
+export async function deleteQuestion(formData: FormData) {
+  await requireAdmin();
+  const questionId = String(formData.get("questionId") ?? "");
+  const path = `/questions/${questionId}`;
+  const admin = createAdminSupabaseClient();
+  const { data, error } = await admin
+    .from("questions")
+    .delete()
+    .eq("id", questionId)
+    .select("id")
+    .maybeSingle();
+  if (error) fail(path, `Could not delete question: ${error.message}`);
+  if (!data) fail(path, "Question not found.");
+
+  revalidatePath("/");
+  revalidatePath("/leaderboard");
+  redirect("/");
 }
 
 export async function approveMember(formData: FormData) {

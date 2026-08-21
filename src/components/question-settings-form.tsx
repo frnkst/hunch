@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
-import { updateQuestionSettings } from "@/app/actions";
+import { deleteQuestion, updateQuestionSettings } from "@/app/actions";
 import { visibilityLabels } from "@/lib/format";
 import type { Question } from "@/lib/types";
 import { visibilityModes } from "@/lib/types";
@@ -15,50 +15,104 @@ function toLocalInputValue(iso: string) {
 
 const subscribe = () => () => {};
 
-export function QuestionSettingsForm({ question }: { question: Question }) {
+export function QuestionSettingsForm({
+  question,
+  isAdmin,
+}: {
+  question: Question;
+  isAdmin: boolean;
+}) {
   const isClient = useSyncExternalStore(subscribe, () => true, () => false);
 
   return (
-    <form action={updateQuestionSettings} className="grid gap-3 sm:grid-cols-2">
-      <input type="hidden" name="questionId" value={question.id} />
-      <input
-        type="hidden"
-        name="timezoneOffset"
-        value={new Date().getTimezoneOffset()}
-      />
-      <label>
-        <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
-          Extend deadline
-        </span>
+    <>
+      <form
+        action={updateQuestionSettings}
+        className="grid gap-3 sm:grid-cols-2"
+      >
+        <input type="hidden" name="questionId" value={question.id} />
         <input
-          type="datetime-local"
-          name="deadline"
-          required
-          defaultValue={
-            isClient ? toLocalInputValue(question.deadline) : undefined
-          }
-          className="field"
+          type="hidden"
+          name="timezoneOffset"
+          value={new Date().getTimezoneOffset()}
         />
-      </label>
-      <label>
-        <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
-          Show predictions
-        </span>
-        <select
-          name="visibility"
-          defaultValue={question.visibility}
-          className="field"
+        {isAdmin ? (
+          <label className="sm:col-span-2">
+            <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
+              Question text
+            </span>
+            <textarea
+              name="text"
+              required
+              minLength={3}
+              maxLength={300}
+              rows={3}
+              defaultValue={question.text}
+              className="field resize-y"
+            />
+          </label>
+        ) : null}
+        <label>
+          <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
+            {isAdmin ? "Deadline" : "Extend deadline"}
+          </span>
+          <input
+            type="datetime-local"
+            name="deadline"
+            required
+            defaultValue={
+              isClient ? toLocalInputValue(question.deadline) : undefined
+            }
+            className="field"
+          />
+        </label>
+        <label>
+          <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
+            Show predictions
+          </span>
+          <select
+            name="visibility"
+            defaultValue={question.visibility}
+            className="field"
+          >
+            {visibilityModes.map((mode) => (
+              <option key={mode} value={mode}>
+                {visibilityLabels[mode]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button type="submit" className="button-secondary sm:col-span-2">
+          Save settings
+        </button>
+      </form>
+
+      {isAdmin ? (
+        <form
+          action={deleteQuestion}
+          className="mt-5 border-t border-rose-100 pt-4"
+          onSubmit={(event) => {
+            if (
+              !window.confirm(
+                "Permanently delete this question and all of its predictions? This cannot be undone.",
+              )
+            ) {
+              event.preventDefault();
+            }
+          }}
         >
-          {visibilityModes.map((mode) => (
-            <option key={mode} value={mode}>
-              {visibilityLabels[mode]}
-            </option>
-          ))}
-        </select>
-      </label>
-      <button type="submit" className="button-secondary sm:col-span-2">
-        Save settings
-      </button>
-    </form>
+          <input type="hidden" name="questionId" value={question.id} />
+          <p className="mb-2 text-xs leading-5 text-rose-700">
+            Admin only: this also permanently deletes every prediction.
+          </p>
+          <button
+            type="submit"
+            className="w-full rounded-xl px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-50"
+          >
+            Permanently delete question
+          </button>
+        </form>
+      ) : null}
+    </>
   );
 }
