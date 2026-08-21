@@ -1,6 +1,7 @@
 "use client";
 
 import { resolveQuestion, savePrediction } from "@/app/actions";
+import { DateTimeField } from "@/components/date-time-field";
 import type { Question } from "@/lib/types";
 
 function AnswerField({
@@ -76,11 +77,9 @@ function AnswerField({
     );
   }
   return (
-    <input
+    <DateTimeField
       name="answer"
-      type="datetime-local"
       required
-      className="field"
     />
   );
 }
