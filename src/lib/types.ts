@@ -8,10 +8,8 @@ export const questionTypes = [
 export type QuestionType = (typeof questionTypes)[number];
 
 export const visibilityModes = [
-  "always",
-  "after_submission",
   "after_deadline",
-  "after_resolution",
+  "always",
 ] as const;
 export type VisibilityMode = (typeof visibilityModes)[number];
 

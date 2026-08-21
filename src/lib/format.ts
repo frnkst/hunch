@@ -9,10 +9,8 @@ export const typeLabels: Record<QuestionType, string> = {
 };
 
 export const visibilityLabels: Record<VisibilityMode, string> = {
+  after_deadline: "After deadline",
   always: "Always visible",
-  after_submission: "After you predict",
-  after_deadline: "After the deadline",
-  after_resolution: "After resolution",
 };
 
 export function formatAnswer(

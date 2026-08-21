@@ -92,7 +92,7 @@ export async function createQuestion(formData: FormData) {
   const text = String(formData.get("text") ?? "").trim();
   const type = String(formData.get("type") ?? "") as QuestionType;
   const visibility = String(
-    formData.get("visibility") ?? "",
+    formData.get("visibility") ?? "after_deadline",
   ) as VisibilityMode;
   const timezoneOffset = Number(formData.get("timezoneOffset"));
   const path = "/new";
