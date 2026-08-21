@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-manrope);
+}
+
+:root {
+  --background: #f7f3ff;
+  --foreground: #302943;
+  --muted: #77708c;
+  --primary: #7457d9;
+  --border: #dfd7ed;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    font-family: var(--font-manrope), sans-serif;
+  }
+
+  body {
+    min-height: 100dvh;
+    color: var(--foreground);
+    background:
+      radial-gradient(circle at 4% -10%, rgb(205 190 255 / 0.5), transparent 31rem),
+      radial-gradient(circle at 104% 16%, rgb(255 211 229 / 0.48), transparent 29rem),
+      radial-gradient(circle at 55% 110%, rgb(198 240 223 / 0.46), transparent 34rem),
+      linear-gradient(180deg, #fdfaff 0%, #f5f0fc 100%);
+    background-attachment: fixed;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    border: 1px solid rgb(255 255 255 / 0.94);
+    background: rgb(255 252 255 / 0.78);
+    box-shadow:
+      0 1px 1px rgb(82 61 136 / 0.03),
+      0 18px 50px rgb(82 61 136 / 0.09);
+    backdrop-filter: blur(22px);
+  }
+
+  .surface-card {
+    border: 1px solid rgb(226 217 239 / 0.88);
+    background: rgb(255 252 255 / 0.9);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.9) inset,
+      0 10px 30px rgb(82 61 136 / 0.07);
+  }
+
+  .eyebrow {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .display-title {
+    font-weight: 750;
+    letter-spacing: -0.065em;
+  }
+
+  .aurora {
+    background:
+      radial-gradient(circle at 18% 18%, rgb(205 190 255 / 0.82), transparent 36%),
+      radial-gradient(circle at 92% 26%, rgb(255 205 226 / 0.64), transparent 37%),
+      radial-gradient(circle at 42% 92%, rgb(193 240 222 / 0.66), transparent 42%),
+      linear-gradient(145deg, #fdfaff, #f4eefc);
+  }
+
+  .field {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 0.8);
+    padding: 0.75rem 0.9rem;
+    color: var(--foreground);
+    outline: none;
+    transition: box-shadow 150ms, border-color 150ms;
+  }
+
+  .field:focus {
+    border-color: #8b72e8;
+    box-shadow: 0 0 0 3px rgb(139 114 232 / 0.15);
+  }
+
+  .button-primary {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 1rem;
+    background: linear-gradient(145deg, #7457d9, #9278ea);
+    padding: 0.7rem 1rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 750;
+    box-shadow: 0 10px 24px rgb(82 61 136 / 0.18);
+    transition: transform 150ms, filter 150ms;
+  }
+
+  .button-primary:hover {
+    filter: brightness(0.96);
+  }
+
+  .button-primary:active {
+    transform: translateY(1px);
+  }
+
+  .button-secondary {
+    display: inline-flex;
+    min-height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    border-radius: 0.9rem;
+    background: #eee8ff;
+    padding: 0.6rem 0.85rem;
+    color: #4d398e;
+    font-size: 0.82rem;
+    font-weight: 750;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
