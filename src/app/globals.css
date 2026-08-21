@@ -98,6 +98,67 @@
     box-shadow: 0 0 0 3px rgb(139 114 232 / 0.15);
   }
 
+  .date-time-field {
+    position: relative;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .date-time-input {
+    display: block;
+    min-inline-size: 0;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    padding-right: 2.75rem;
+  }
+
+  .date-time-input::-webkit-date-and-time-value {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .date-time-input:invalid {
+    color: transparent;
+  }
+
+  .date-time-input:focus {
+    color: var(--foreground);
+  }
+
+  .date-time-input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+  }
+
+  .date-time-placeholder,
+  .date-time-icon {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .date-time-placeholder {
+    top: 50%;
+    left: 0.9rem;
+    overflow: hidden;
+    max-width: calc(100% - 3.65rem);
+    color: var(--muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transform: translateY(-50%);
+  }
+
+  .date-time-icon {
+    top: 50%;
+    right: 0.9rem;
+    color: var(--primary);
+    transform: translateY(-50%);
+  }
+
+  .date-time-field:has(.date-time-input:valid) .date-time-placeholder,
+  .date-time-field:has(.date-time-input:focus) .date-time-placeholder {
+    display: none;
+  }
+
   .button-primary {
     display: inline-flex;
     min-height: 2.75rem;

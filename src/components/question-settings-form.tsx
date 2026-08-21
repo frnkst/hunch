@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 
 import { deleteQuestion, updateQuestionSettings } from "@/app/actions";
+import { DateTimeField } from "@/components/date-time-field";
 import { visibilityLabels } from "@/lib/format";
 import type { Question } from "@/lib/types";
 import { visibilityModes } from "@/lib/types";
@@ -56,14 +57,12 @@ export function QuestionSettingsForm({
           <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
             {isAdmin ? "Deadline" : "Extend deadline"}
           </span>
-          <input
-            type="datetime-local"
+          <DateTimeField
             name="deadline"
             required
             defaultValue={
               isClient ? toLocalInputValue(question.deadline) : undefined
             }
-            className="field"
           />
         </label>
         <label>

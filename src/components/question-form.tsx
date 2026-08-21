@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { createQuestion } from "@/app/actions";
+import { DateTimeField } from "@/components/date-time-field";
 import { visibilityLabels } from "@/lib/format";
 import {
   questionTypes,
@@ -74,11 +75,9 @@ export function QuestionForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
           <span className="mb-2 block text-sm font-bold">Deadline</span>
-          <input
-            type="datetime-local"
+          <DateTimeField
             name="deadline"
             required
-            className="field"
           />
         </label>
         <label className="block">
