@@ -72,15 +72,15 @@ export function QuestionForm() {
         </label>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block">
+      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
+        <label className="block min-w-0">
           <span className="mb-2 block text-sm font-bold">Deadline</span>
           <DateTimeField
             name="deadline"
             required
           />
         </label>
-        <label className="block">
+        <label className="block min-w-0">
           <span className="mb-2 block text-sm font-bold">
             Show predictions
           </span>

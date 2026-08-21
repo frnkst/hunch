@@ -29,7 +29,7 @@ export function QuestionSettingsForm({
     <>
       <form
         action={updateQuestionSettings}
-        className="grid gap-3 sm:grid-cols-2"
+        className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2"
       >
         <input type="hidden" name="questionId" value={question.id} />
         <input
@@ -53,7 +53,7 @@ export function QuestionSettingsForm({
             />
           </label>
         ) : null}
-        <label>
+        <label className="min-w-0">
           <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
             {isAdmin ? "Deadline" : "Extend deadline"}
           </span>
@@ -65,7 +65,7 @@ export function QuestionSettingsForm({
             }
           />
         </label>
-        <label>
+        <label className="min-w-0">
           <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
             Show predictions
           </span>

@@ -103,14 +103,19 @@
     min-width: 0;
     width: 100%;
     max-width: 100%;
+    overflow: hidden;
+    border-radius: 1rem;
   }
 
   .date-time-input {
     display: block;
+    box-sizing: border-box;
     min-inline-size: 0;
     inline-size: 100%;
     max-inline-size: 100%;
     padding-right: 2.75rem;
+    appearance: none;
+    -webkit-appearance: none;
   }
 
   .date-time-input::-webkit-date-and-time-value {
@@ -124,6 +129,7 @@
 
   .date-time-input:focus {
     color: var(--foreground);
+    box-shadow: none;
   }
 
   .date-time-input::-webkit-calendar-picker-indicator {
@@ -157,6 +163,10 @@
   .date-time-field:has(.date-time-input:valid) .date-time-placeholder,
   .date-time-field:has(.date-time-input:focus) .date-time-placeholder {
     display: none;
+  }
+
+  .date-time-field:focus-within {
+    box-shadow: 0 0 0 3px rgb(139 114 232 / 0.15);
   }
 
   .button-primary {
