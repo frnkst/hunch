@@ -27,7 +27,7 @@ export default async function Home({
       <AppHeader active="home" profile={profile} />
       <Notice error={params.error} />
 
-      <section className="mb-7 flex items-end justify-between gap-5 px-1">
+      <section className="mb-7 px-1">
         <div>
           <p className="eyebrow text-violet-700">Predict together</p>
           <h1 className="display-title mt-1 text-[2.8rem] leading-[0.98] sm:text-5xl">
@@ -38,13 +38,6 @@ export default async function Home({
             </span>
           </h1>
         </div>
-        <Link
-          href="/new"
-          aria-label="New question"
-          className="button-primary hidden size-14 p-0 text-4xl leading-none sm:inline-flex"
-        >
-          <span aria-hidden="true">+</span>
-        </Link>
       </section>
 
       <div className="mb-5 flex gap-2">
