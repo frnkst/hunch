@@ -37,7 +37,7 @@ export default async function QuestionPage({
   const membership = await requireMembership();
   const { id } = await params;
   const query = await searchParams;
-  const { question, predictions } = await getQuestion(id);
+  const { question, predictions, participants } = await getQuestion(id);
   if (!question) notFound();
 
   const deadlinePassed = new Date(question.deadline) <= new Date();
@@ -53,6 +53,9 @@ export default async function QuestionPage({
   const mayPredict = question.status === "open" && !deadlinePassed;
   const ownPrediction = predictions.find(
     (prediction) => prediction.user_id === membership.user.id,
+  );
+  const predictionsByUser = new Map(
+    predictions.map((prediction) => [prediction.user_id, prediction]),
   );
 
   return (
@@ -142,46 +145,53 @@ export default async function QuestionPage({
               Predictions
             </h2>
             <span className="text-xs font-bold text-[#77708c]">
-              {predictions.length} visible
+              {participants.length} predicted
             </span>
           </div>
-          {predictions.length ? (
+          {participants.length ? (
             <ul className="space-y-2">
-              {predictions.map((prediction) => (
-                <li
-                  key={prediction.id}
-                  className="flex items-center gap-3 rounded-[1.15rem] bg-white/65 p-3"
-                >
-                  {prediction.profile ? (
+              {participants.map((participant) => {
+                const prediction = predictionsByUser.get(participant.user_id);
+                return (
+                  <li
+                    key={participant.user_id}
+                    className="flex items-center gap-3 rounded-[1.15rem] bg-white/65 p-3"
+                  >
                     <Avatar
-                      username={prediction.profile.username}
-                      src={prediction.profile.avatar_url}
+                      username={participant.username}
+                      src={participant.avatar_url}
                       size="md"
                     />
-                  ) : null}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-bold text-[#77708c]">
-                      @{prediction.profile?.username ?? "member"}
-                    </p>
-                    <p className="truncate text-sm font-extrabold">
-                      <AnswerValue
-                        type={question.type}
-                        answer={prediction.answer}
-                      />
-                    </p>
-                  </div>
-                  {question.status === "resolved" ? (
-                    <span className="rounded-full bg-violet-100 px-2.5 py-1 text-xs font-black text-violet-700">
-                      {Number(prediction.points ?? 0)} pts
-                    </span>
-                  ) : null}
-                </li>
-              ))}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-bold text-[#77708c]">
+                        @{participant.username}
+                      </p>
+                      <p className="truncate text-sm font-extrabold">
+                        {prediction ? (
+                          <AnswerValue
+                            type={question.type}
+                            answer={prediction.answer}
+                          />
+                        ) : (
+                          <span className="text-[#77708c]">
+                            Prediction hidden until deadline
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    {question.status === "resolved" && prediction ? (
+                      <span className="rounded-full bg-violet-100 px-2.5 py-1 text-xs font-black text-violet-700">
+                        {Number(prediction.points ?? 0)} pts
+                      </span>
+                    ) : null}
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <div className="py-9 text-center text-sm text-[#77708c]">
               <Hourglass className="mx-auto mb-2 size-5 text-violet-400" />
-              No predictions are visible yet.
+              No predictions yet.
             </div>
           )}
         </section>

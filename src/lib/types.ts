@@ -43,3 +43,9 @@ export type Prediction = {
     avatar_url: string | null;
   } | null;
 };
+
+export type PredictionParticipant = {
+  user_id: string;
+  username: string;
+  avatar_url: string | null;
+};

@@ -1,7 +1,11 @@
 import "server-only";
 
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { Prediction, Question } from "@/lib/types";
+import type {
+  Prediction,
+  PredictionParticipant,
+  Question,
+} from "@/lib/types";
 
 function normalizeQuestion(row: Record<string, unknown>): Question {
   return {
@@ -38,32 +42,44 @@ export async function getQuestions(): Promise<Question[]> {
 export async function getQuestion(questionId: string): Promise<{
   question: Question | null;
   predictions: Prediction[];
+  participants: PredictionParticipant[];
 }> {
   const supabase = await createServerSupabaseClient();
-  const [{ data: questionRow, error: questionError }, predictionsResult] =
-    await Promise.all([
-      supabase
-        .from("questions")
-        .select(
-          "*,creator:profiles!questions_creator_id_fkey(username,avatar_url)",
-        )
-        .eq("id", questionId)
-        .maybeSingle(),
-      supabase
-        .from("predictions")
-        .select(
-          "*,profile:profiles!predictions_user_id_fkey(username,avatar_url)",
-        )
-        .eq("question_id", questionId)
-        .order("points", { ascending: false, nullsFirst: false })
-        .order("updated_at", { ascending: true }),
-    ]);
+  const [
+    { data: questionRow, error: questionError },
+    predictionsResult,
+    participantsResult,
+  ] = await Promise.all([
+    supabase
+      .from("questions")
+      .select(
+        "*,creator:profiles!questions_creator_id_fkey(username,avatar_url)",
+      )
+      .eq("id", questionId)
+      .maybeSingle(),
+    supabase
+      .from("predictions")
+      .select(
+        "*,profile:profiles!predictions_user_id_fkey(username,avatar_url)",
+      )
+      .eq("question_id", questionId)
+      .order("points", { ascending: false, nullsFirst: false })
+      .order("updated_at", { ascending: true }),
+    supabase.rpc("list_prediction_participants", {
+      target_question_id: questionId,
+    }),
+  ]);
   if (questionError) {
     throw new Error(`Could not load question: ${questionError.message}`);
   }
   if (predictionsResult.error) {
     throw new Error(
       `Could not load predictions: ${predictionsResult.error.message}`,
+    );
+  }
+  if (participantsResult.error) {
+    throw new Error(
+      `Could not load prediction participants: ${participantsResult.error.message}`,
     );
   }
   return {
@@ -73,6 +89,7 @@ export async function getQuestion(questionId: string): Promise<{
     predictions: (predictionsResult.data ?? []).map((row) =>
       normalizePrediction(row as Record<string, unknown>),
     ),
+    participants: (participantsResult.data ?? []) as PredictionParticipant[],
   };
 }
 
