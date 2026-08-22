@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarClock } from "lucide-react";
+import { ArrowRight, CalendarClock, Gift } from "lucide-react";
 import Link from "next/link";
 
 import { Avatar } from "@/components/avatar";
@@ -41,6 +41,12 @@ export function QuestionCard({ question }: { question: Question }) {
       <h2 className="text-lg font-extrabold leading-snug tracking-[-0.025em]">
         {question.text}
       </h2>
+      {question.reward ? (
+        <p className="mt-3 flex items-center gap-2 text-xs font-bold text-violet-700">
+          <Gift className="size-3.5 shrink-0" />
+          <span className="truncate">{question.reward}</span>
+        </p>
+      ) : null}
       <div className="mt-5 flex items-center justify-between gap-3 text-xs text-[#77708c]">
         <span className="flex items-center gap-2 font-semibold">
           {question.creator ? (

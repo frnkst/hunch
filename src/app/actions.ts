@@ -94,6 +94,7 @@ export async function createQuestion(formData: FormData) {
   const visibility = String(
     formData.get("visibility") ?? "after_deadline",
   ) as VisibilityMode;
+  const reward = String(formData.get("reward") ?? "").trim();
   const timezoneOffset = Number(formData.get("timezoneOffset"));
   const path = "/new";
 
@@ -103,6 +104,9 @@ export async function createQuestion(formData: FormData) {
   if (!questionTypes.includes(type)) fail(path, "Choose a question type.");
   if (!visibilityModes.includes(visibility)) {
     fail(path, "Choose when predictions become visible.");
+  }
+  if (reward.length > 200) {
+    fail(path, "Reward must be 200 characters or fewer.");
   }
   if (!Number.isFinite(timezoneOffset)) fail(path, "Invalid time zone.");
 
@@ -144,6 +148,7 @@ export async function createQuestion(formData: FormData) {
       options,
       deadline: deadline.toISOString(),
       visibility,
+      reward: reward || null,
     })
     .select("id")
     .single();
@@ -317,6 +322,7 @@ export async function updateQuestionSettings(formData: FormData) {
   const visibility = String(
     formData.get("visibility") ?? "",
   ) as VisibilityMode;
+  const reward = String(formData.get("reward") ?? "").trim();
   const timezoneOffset = Number(formData.get("timezoneOffset"));
   const admin = createAdminSupabaseClient();
   const { data } = await admin
@@ -335,6 +341,9 @@ export async function updateQuestionSettings(formData: FormData) {
   if (!visibilityModes.includes(visibility)) {
     fail(path, "Choose a valid visibility.");
   }
+  if (reward.length > 200) {
+    fail(path, "Reward must be 200 characters or fewer.");
+  }
 
   let deadline: Date;
   try {
@@ -352,10 +361,12 @@ export async function updateQuestionSettings(formData: FormData) {
   const updates: {
     deadline: string;
     visibility: VisibilityMode;
+    reward: string | null;
     text?: string;
   } = {
     deadline: deadline.toISOString(),
     visibility,
+    reward: reward || null,
   };
   if (isAdmin) {
     const text = String(formData.get("text") ?? "").trim();

@@ -19,6 +19,7 @@ function question(
     options: null,
     deadline,
     visibility: "after_deadline",
+    reward: null,
     status,
     correct_answer: status === "resolved" ? true : null,
     resolved_at: status === "resolved" ? "2026-08-20T12:00:00.000Z" : null,

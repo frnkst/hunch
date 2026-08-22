@@ -81,6 +81,18 @@ export function QuestionSettingsForm({
             ))}
           </select>
         </label>
+        <label className="min-w-0 sm:col-span-2">
+          <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
+            Prize or reward (optional)
+          </span>
+          <input
+            name="reward"
+            maxLength={200}
+            defaultValue={question.reward ?? ""}
+            className="field"
+            placeholder="e.g. Winner gets dinner"
+          />
+        </label>
         <button type="submit" className="button-secondary sm:col-span-2">
           Save settings
         </button>

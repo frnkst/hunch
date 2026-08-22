@@ -96,6 +96,17 @@ export function QuestionForm() {
             ))}
           </select>
         </label>
+        <label className="block min-w-0 sm:col-span-2">
+          <span className="mb-2 block text-sm font-bold">
+            Prize or reward <span className="font-normal text-[#77708c]">(optional)</span>
+          </span>
+          <input
+            name="reward"
+            maxLength={200}
+            className="field"
+            placeholder="e.g. Winner gets dinner"
+          />
+        </label>
       </div>
 
       <button type="submit" className="button-primary w-full sm:w-auto">

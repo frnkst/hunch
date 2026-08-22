@@ -3,6 +3,7 @@ import {
   CalendarClock,
   CheckCircle2,
   Eye,
+  Gift,
   Hourglass,
   Users,
 } from "lucide-react";
@@ -112,6 +113,16 @@ export default async function QuestionPage({
             {visibilityLabels[question.visibility]}
           </span>
         </div>
+
+        {question.reward ? (
+          <div className="mt-6 flex items-start gap-3 rounded-[1.25rem] bg-violet-50 p-4 text-violet-800">
+            <Gift className="mt-0.5 size-5 shrink-0" />
+            <div>
+              <p className="eyebrow">Prize or reward</p>
+              <p className="mt-1 text-sm font-extrabold">{question.reward}</p>
+            </div>
+          </div>
+        ) : null}
 
         {question.status === "resolved" &&
         question.correct_answer !== null ? (

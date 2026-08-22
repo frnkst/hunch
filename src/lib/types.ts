@@ -21,6 +21,7 @@ export type Question = {
   options: string[] | null;
   deadline: string;
   visibility: VisibilityMode;
+  reward: string | null;
   status: "open" | "resolved" | "cancelled";
   correct_answer: string | number | boolean | null;
   resolved_at: string | null;
