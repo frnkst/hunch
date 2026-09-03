@@ -26,6 +26,7 @@ export type Question = {
   type: QuestionType;
   options: string[] | null;
   open_choices: OpenChoice[];
+  own_open_choice_count: number;
   deadline: string;
   visibility: VisibilityMode;
   reward: string | null;

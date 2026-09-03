@@ -18,6 +18,7 @@ function question(
     type: "boolean",
     options: null,
     open_choices: [],
+    own_open_choice_count: 0,
     deadline,
     visibility: "after_deadline",
     reward: null,

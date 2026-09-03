@@ -24,6 +24,7 @@ function OpenChoiceField({
     defaultChoice ? `existing:${defaultChoice.id}` : "",
   );
   const [newChoices, setNewChoices] = useState("");
+  const remainingChoices = Math.max(0, 3 - question.own_open_choice_count);
   const addedChoices = newChoices
     .split("\n")
     .map((choice) => choice.trim().replace(/\s+/g, " "))
@@ -57,54 +58,61 @@ function OpenChoiceField({
 
   return (
     <div className="space-y-2">
-      <label className="block">
-        <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
-          Add options (optional)
-        </span>
-        <textarea
-          name="newChoices"
-          value={newChoices}
-          onChange={(event) => {
-            const value = event.target.value;
-            const optionCount = value
-              .split("\n")
-              .filter((choice) => choice.trim()).length;
-            if (optionCount <= 3) setNewChoices(value);
-          }}
-          maxLength={302}
-          rows={3}
-          className="field resize-none"
-          placeholder={"Your option\nAnother option\nOne more option"}
-        />
-        <span className="mt-1 block text-xs text-[#77708c]">
-          Up to 3 options, one per line.
-        </span>
-      </label>
+      {remainingChoices > 0 ? (
+        <label className="block">
+          <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
+            Add options (optional)
+          </span>
+          <textarea
+            name="newChoices"
+            value={newChoices}
+            onChange={(event) => {
+              const value = event.target.value;
+              const optionCount = value
+                .split("\n")
+                .filter((choice) => choice.trim()).length;
+              if (optionCount <= remainingChoices) setNewChoices(value);
+            }}
+            maxLength={remainingChoices * 101}
+            rows={remainingChoices}
+            className="field resize-none"
+            placeholder={"Your option\nAnother option\nOne more option"}
+          />
+          <span className="mt-1 block text-xs text-[#77708c]">
+            You can add {remainingChoices} more option
+            {remainingChoices === 1 ? "" : "s"}, one per line.
+          </span>
+        </label>
+      ) : (
+        <p className="rounded-xl bg-violet-50 px-3 py-2 text-xs font-semibold text-violet-700">
+          You already added all 3 options available to you.
+        </p>
+      )}
       <label className="block">
         <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
           Your prediction
         </span>
-      <select
-        name="choiceSelection"
-        value={choiceId}
-        onChange={(event) => setChoiceId(event.target.value)}
-        required
-        className="field"
-      >
-        <option value="" disabled>
-          Choose an option…
-        </option>
-        {question.open_choices.map((choice) => (
-          <option key={choice.id} value={`existing:${choice.id}`}>
-            {choice.value}
+        <select
+          name="choiceSelection"
+          value={choiceId}
+          onChange={(event) => setChoiceId(event.target.value)}
+          required
+          className="field"
+        >
+          <option value="" disabled>
+            Choose an option…
           </option>
-        ))}
-        {addedChoices.map((choice, index) => (
-          <option key={`${choice}-${index}`} value={`new:${index}`}>
-            {choice} (new)
-          </option>
-        ))}
-      </select>
+          {question.open_choices.map((choice) => (
+            <option key={choice.id} value={`existing:${choice.id}`}>
+              {choice.value}
+            </option>
+          ))}
+          {addedChoices.map((choice, index) => (
+            <option key={`${choice}-${index}`} value={`new:${index}`}>
+              {choice} (new)
+            </option>
+          ))}
+        </select>
       </label>
     </div>
   );

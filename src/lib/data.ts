@@ -14,6 +14,7 @@ function normalizeQuestion(row: Record<string, unknown>): Question {
     open_choices: Array.isArray(row.open_choices)
       ? (row.open_choices as Question["open_choices"])
       : [],
+    own_open_choice_count: Number(row.own_open_choice_count ?? 0),
     creator: Array.isArray(row.creator)
       ? (row.creator[0] as Question["creator"])
       : (row.creator as Question["creator"]),
@@ -54,6 +55,7 @@ export async function getQuestion(questionId: string): Promise<{
     predictionsResult,
     participantsResult,
     choicesResult,
+    contributionCountResult,
   ] = await Promise.all([
     supabase
       .from("questions")
@@ -78,6 +80,9 @@ export async function getQuestion(questionId: string): Promise<{
       .select("id,value")
       .eq("question_id", questionId)
       .order("created_at"),
+    supabase.rpc("get_open_choice_contribution_count", {
+      target_question_id: questionId,
+    }),
   ]);
   if (questionError) {
     throw new Error(`Could not load question: ${questionError.message}`);
@@ -95,6 +100,11 @@ export async function getQuestion(questionId: string): Promise<{
   if (choicesResult.error) {
     throw new Error(`Could not load choices: ${choicesResult.error.message}`);
   }
+  if (contributionCountResult.error) {
+    throw new Error(
+      `Could not load option allowance: ${contributionCountResult.error.message}`,
+    );
+  }
   const question = questionRow
     ? normalizeQuestion(questionRow as Record<string, unknown>)
     : null;
@@ -103,6 +113,7 @@ export async function getQuestion(questionId: string): Promise<{
       ? {
           ...question,
           open_choices: (choicesResult.data ?? []) as Question["open_choices"],
+          own_open_choice_count: Number(contributionCountResult.data ?? 0),
         }
       : null,
     predictions: (predictionsResult.data ?? []).map((row) =>
