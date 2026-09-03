@@ -102,6 +102,19 @@ export default async function LeaderboardPage({
           </div>
         )}
       </section>
+      <section className="mt-5 rounded-[1.5rem] border border-violet-100 bg-white/55 px-4 py-4 text-xs leading-5 text-[#77708c]">
+        <h2 className="font-extrabold text-[#302943]">How points work</h2>
+        <p className="mt-1.5">
+          Yes/no and choice predictions earn 10 points for the correct answer
+          and 0 otherwise. Number and date/time predictions earn 10, 7, and 4
+          points for first, second, and third closest; all others earn 0.
+        </p>
+        <p className="mt-1">
+          Ties share the same place and consume the tied places. A lone number
+          or date/time prediction earns 10 points only when it is exact.
+          No-outcome questions award no points.
+        </p>
+      </section>
     </main>
   );
 }

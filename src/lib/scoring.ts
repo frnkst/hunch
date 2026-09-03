@@ -50,9 +50,15 @@ export function scorePredictions(
     .sort((a, b) => a.distance - b.distance);
 
   if (ranked.length === 1) {
-    return [{ ...ranked[0], points: 10 }];
+    return [
+      {
+        ...predictions[0],
+        points: ranked[0].distance === 0 ? 10 : 0,
+      },
+    ];
   }
 
+  const pointsByPlace = [10, 7, 4];
   const scores = new Map<string, number>();
   for (let start = 0; start < ranked.length; ) {
     let end = start;
@@ -62,10 +68,7 @@ export function scorePredictions(
     ) {
       end += 1;
     }
-    const averageRank = (start + end) / 2;
-    const points = Number(
-      (10 * (1 - averageRank / (ranked.length - 1))).toFixed(2),
-    );
+    const points = pointsByPlace[start] ?? 0;
     for (let index = start; index <= end; index += 1) {
       scores.set(ranked[index].id, points);
     }

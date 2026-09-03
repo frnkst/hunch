@@ -35,7 +35,7 @@ describe("scorePredictions", () => {
     ]);
   });
 
-  it("distributes numeric points by proportional rank", () => {
+  it("awards fixed podium points by numeric rank", () => {
     expect(
       scorePredictions(
         "number",
@@ -43,17 +43,19 @@ describe("scorePredictions", () => {
           { id: "a", answer: 100 },
           { id: "b", answer: 110 },
           { id: "c", answer: 130 },
+          { id: "d", answer: 150 },
         ],
         100,
       ).map(({ id, points }) => ({ id, points })),
     ).toEqual([
       { id: "a", points: 10 },
-      { id: "b", points: 5 },
-      { id: "c", points: 0 },
+      { id: "b", points: 7 },
+      { id: "c", points: 4 },
+      { id: "d", points: 0 },
     ]);
   });
 
-  it("averages the occupied points for ties", () => {
+  it("uses competition ranking for ties", () => {
     expect(
       scorePredictions(
         "number",
@@ -65,9 +67,18 @@ describe("scorePredictions", () => {
         100,
       ).map(({ id, points }) => ({ id, points })),
     ).toEqual([
-      { id: "a", points: 7.5 },
-      { id: "b", points: 7.5 },
-      { id: "c", points: 0 },
+      { id: "a", points: 10 },
+      { id: "b", points: 10 },
+      { id: "c", points: 4 },
     ]);
+  });
+
+  it("only awards a lone prediction when it is exact", () => {
+    expect(
+      scorePredictions("number", [{ id: "a", answer: 99 }], 100)[0].points,
+    ).toBe(0);
+    expect(
+      scorePredictions("number", [{ id: "a", answer: 100 }], 100)[0].points,
+    ).toBe(10);
   });
 });

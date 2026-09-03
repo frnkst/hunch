@@ -15,8 +15,8 @@ Habitz.
 - Creator resolution, admin override, and question cancellation
 - No-outcome resolution with no winner or leaderboard points
 - 10/0 scoring for categorical questions
-- Proportional 10-to-0 rank scoring for number and date questions, with tied
-  ranks sharing their occupied points
+- Fixed 10/7/4/0 podium scoring for number and date questions, with tied ranks
+  sharing points and consuming their occupied places
 - All-time, monthly, and yearly leaderboards
 
 ## Local setup

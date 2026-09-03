@@ -4,7 +4,7 @@ export function HunchLoader({
   compact = false,
   hideLabel = false,
   inverted = false,
-  label = "Reading the room",
+  label = "Loading",
 }: {
   compact?: boolean;
   hideLabel?: boolean;
