@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { signOut } from "@/app/actions";
 import { Avatar } from "@/components/avatar";
+import { SubmitButton } from "@/components/submit-button";
 import { getMembership } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -36,10 +37,14 @@ export default async function PendingPage() {
             Check again
           </a>
           <form action={signOut}>
-            <button type="submit" className="button-secondary h-full w-full">
+            <SubmitButton
+              type="submit"
+              className="button-secondary h-full w-full"
+              pendingLabel="Signing out"
+            >
               <LogOut className="size-4" />
               Sign out
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </section>

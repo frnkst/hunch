@@ -3,6 +3,7 @@
 import { UserMinus } from "lucide-react";
 
 import { removeMember } from "@/app/actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export function RemoveMemberButton({ userId }: { userId: string }) {
   return (
@@ -19,13 +20,14 @@ export function RemoveMemberButton({ userId }: { userId: string }) {
       }}
     >
       <input type="hidden" name="userId" value={userId} />
-      <button
+      <SubmitButton
         type="submit"
         className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50"
+        pendingLabel="Removing member"
       >
         <UserMinus className="size-4" />
         Remove
-      </button>
+      </SubmitButton>
     </form>
   );
 }

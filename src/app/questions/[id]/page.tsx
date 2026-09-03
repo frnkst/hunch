@@ -18,6 +18,7 @@ import { Avatar } from "@/components/avatar";
 import { LocalTime } from "@/components/local-time";
 import { Notice } from "@/components/notice";
 import { QuestionSettingsForm } from "@/components/question-settings-form";
+import { SubmitButton } from "@/components/submit-button";
 import { requireMembership } from "@/lib/auth";
 import { getQuestion } from "@/lib/data";
 import { typeLabels, visibilityLabels } from "@/lib/format";
@@ -265,12 +266,13 @@ export default async function QuestionPage({
               {mayCancel ? (
                 <form action={cancelQuestion} className="mt-3">
                   <input type="hidden" name="questionId" value={question.id} />
-                  <button
+                  <SubmitButton
                     type="submit"
                     className="w-full rounded-xl px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50"
+                    pendingLabel="Cancelling question"
                   >
                     Cancel question
-                  </button>
+                  </SubmitButton>
                 </form>
               ) : null}
             </section>

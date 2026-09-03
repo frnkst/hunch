@@ -10,6 +10,7 @@ import Link from "next/link";
 
 import { signOut } from "@/app/actions";
 import { Avatar } from "@/components/avatar";
+import { SubmitButton } from "@/components/submit-button";
 import type { Profile } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -76,13 +77,15 @@ export function AppHeader({
             size="md"
           />
           <form action={signOut}>
-            <button
+            <SubmitButton
               type="submit"
               className="flex size-9 items-center justify-center rounded-full bg-white/65 text-violet-700 hover:bg-white"
               aria-label="Sign out"
+              pendingLabel="Signing out"
+              hidePendingLabel
             >
               <LogOut className="size-4" />
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </header>

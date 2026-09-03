@@ -206,6 +206,68 @@
     font-size: 0.82rem;
     font-weight: 750;
   }
+
+  .button-primary:disabled,
+  .button-secondary:disabled {
+    cursor: wait;
+    opacity: 0.82;
+  }
+
+  .hunch-loader-orbit {
+    border: 2px solid rgb(116 87 217 / 0.16);
+    border-top-color: #7457d9;
+    border-right-color: #a58cf0;
+    animation: hunch-orbit 1.25s linear infinite;
+    box-shadow: 0 0 24px rgb(116 87 217 / 0.16);
+  }
+
+  .hunch-loader-orbit-reverse {
+    border: 2px solid rgb(121 207 178 / 0.22);
+    border-bottom-color: #52bb94;
+    border-left-color: #9cdfc7;
+    animation: hunch-orbit 1.8s linear infinite reverse;
+  }
+
+  .hunch-loader-core {
+    background: linear-gradient(145deg, #7457d9, #a98cf2 58%, #ef9fbd);
+    box-shadow:
+      0 8px 20px rgb(82 61 136 / 0.22),
+      0 0 0 5px rgb(255 255 255 / 0.72);
+    animation: hunch-breathe 1.8s ease-in-out infinite;
+    transform: rotate(45deg);
+  }
+
+  .hunch-loader-dot {
+    animation: hunch-dot 1s ease-in-out infinite;
+  }
+}
+
+@keyframes hunch-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hunch-breathe {
+  0%,
+  100% {
+    transform: rotate(45deg) scale(0.88);
+  }
+  50% {
+    transform: rotate(45deg) scale(1.08);
+  }
+}
+
+@keyframes hunch-dot {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

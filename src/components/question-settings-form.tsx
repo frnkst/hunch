@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 
 import { deleteQuestion, updateQuestionSettings } from "@/app/actions";
 import { DateTimeField } from "@/components/date-time-field";
+import { SubmitButton } from "@/components/submit-button";
 import { visibilityLabels } from "@/lib/format";
 import type { Question } from "@/lib/types";
 import { visibilityModes } from "@/lib/types";
@@ -93,9 +94,13 @@ export function QuestionSettingsForm({
             placeholder="e.g. Winner gets dinner"
           />
         </label>
-        <button type="submit" className="button-secondary sm:col-span-2">
+        <SubmitButton
+          type="submit"
+          className="button-secondary sm:col-span-2"
+          pendingLabel="Saving settings"
+        >
           Save settings
-        </button>
+        </SubmitButton>
       </form>
 
       {isAdmin ? (
@@ -116,12 +121,13 @@ export function QuestionSettingsForm({
           <p className="mb-2 text-xs leading-5 text-rose-700">
             Admin only: this also permanently deletes every prediction.
           </p>
-          <button
+          <SubmitButton
             type="submit"
             className="w-full rounded-xl px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-50"
+            pendingLabel="Deleting question"
           >
             Permanently delete question
-          </button>
+          </SubmitButton>
         </form>
       ) : null}
     </>

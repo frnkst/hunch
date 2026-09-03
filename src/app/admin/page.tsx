@@ -5,6 +5,7 @@ import { AppHeader } from "@/components/app-header";
 import { Avatar } from "@/components/avatar";
 import { Notice } from "@/components/notice";
 import { RemoveMemberButton } from "@/components/remove-member-button";
+import { SubmitButton } from "@/components/submit-button";
 import { requireAdmin } from "@/lib/auth";
 import { getPendingProfiles, getProfiles } from "@/lib/data";
 
@@ -61,10 +62,15 @@ export default async function AdminPage({
                 </p>
                 <form action={approveMember}>
                   <input type="hidden" name="userId" value={member.user_id} />
-                  <button type="submit" className="button-primary">
+                  <SubmitButton
+                    type="submit"
+                    className="button-primary"
+                    pendingLabel="Approving"
+                    inverted
+                  >
                     <UserCheck className="size-4" />
                     Approve
-                  </button>
+                  </SubmitButton>
                 </form>
               </li>
             ))}

@@ -2,6 +2,7 @@ import { ArrowRight, GitBranch, Sparkles } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { signInWithGitHub } from "@/app/actions";
+import { SubmitButton } from "@/components/submit-button";
 import { getMembership } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -53,11 +54,16 @@ export default async function LoginPage({
           </p>
         ) : null}
         <form action={signInWithGitHub} className="mt-9">
-          <button type="submit" className="button-primary h-14 w-full text-base">
+          <SubmitButton
+            type="submit"
+            className="button-primary h-14 w-full text-base"
+            pendingLabel="Opening GitHub"
+            inverted
+          >
             <GitBranch className="size-5" />
             Continue with GitHub
             <ArrowRight className="ml-auto size-4" />
-          </button>
+          </SubmitButton>
         </form>
       </section>
     </main>

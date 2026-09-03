@@ -1,12 +1,18 @@
+import { HunchLoader } from "@/components/hunch-loader";
+
 export default function Loading() {
   return (
-    <main className="mx-auto min-h-dvh w-full max-w-5xl animate-pulse px-4 py-6">
-      <div className="h-10 w-32 rounded-xl bg-violet-100" />
-      <div className="mt-10 h-20 w-64 rounded-2xl bg-violet-100" />
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <div className="h-48 rounded-[1.5rem] bg-white/70" />
-        <div className="h-48 rounded-[1.5rem] bg-white/70" />
-      </div>
+    <main className="relative flex min-h-dvh items-center justify-center overflow-hidden px-5">
+      <div className="aurora absolute inset-0 -z-20" />
+      <div className="absolute top-[18%] left-[8%] -z-10 size-36 rounded-full bg-violet-300/30 blur-3xl" />
+      <div className="absolute right-[4%] bottom-[18%] -z-10 size-44 rounded-full bg-emerald-200/35 blur-3xl" />
+      <section className="glass-panel relative w-full max-w-xs overflow-hidden rounded-[2.25rem] px-8 py-10">
+        <div className="absolute -top-14 -right-14 size-32 rounded-full border-[24px] border-[#ffd9e7]/60" />
+        <HunchLoader label="Reading the room" />
+        <p className="mt-5 text-center text-xs font-medium leading-5 text-[#77708c]">
+          A quick pause while the hunches come together.
+        </p>
+      </section>
     </main>
   );
 }

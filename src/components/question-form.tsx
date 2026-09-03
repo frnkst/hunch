@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { createQuestion } from "@/app/actions";
 import { DateTimeField } from "@/components/date-time-field";
+import { SubmitButton } from "@/components/submit-button";
 import { typeLabels, visibilityLabels } from "@/lib/format";
 import {
   questionTypes,
@@ -119,9 +120,14 @@ export function QuestionForm() {
         </label>
       </div>
 
-      <button type="submit" className="button-primary w-full sm:w-auto">
+      <SubmitButton
+        type="submit"
+        className="button-primary w-full sm:w-auto"
+        pendingLabel="Creating hunch"
+        inverted
+      >
         Create hunch
-      </button>
+      </SubmitButton>
     </form>
   );
 }

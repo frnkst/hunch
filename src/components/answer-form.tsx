@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { resolveQuestion, savePrediction } from "@/app/actions";
 import { DateTimeField } from "@/components/date-time-field";
+import { SubmitButton } from "@/components/submit-button";
 import type { Question } from "@/lib/types";
 
 function OpenChoiceField({
@@ -291,7 +292,18 @@ export function AnswerForm({
           mode={mode}
         />
       )}
-      <button type="submit" className="button-primary w-full">
+      <SubmitButton
+        type="submit"
+        className="button-primary w-full"
+        pendingLabel={
+          mode === "predict"
+            ? "Saving your hunch"
+            : noOutcome
+              ? "Recording outcome"
+              : "Scoring predictions"
+        }
+        inverted
+      >
         {mode === "predict"
           ? defaultValue === undefined
             ? "Lock in my hunch"
@@ -299,7 +311,7 @@ export function AnswerForm({
           : noOutcome
             ? "Record no outcome"
             : "Set outcome & score"}
-      </button>
+      </SubmitButton>
     </form>
   );
 }
