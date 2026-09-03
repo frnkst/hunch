@@ -11,6 +11,9 @@ export default async function PendingPage() {
   const membership = await getMembership();
   if (!membership) redirect("/login");
   if (membership.profile.status === "approved") redirect("/");
+  if (membership.profile.status === "removed") {
+    redirect("/login?error=This membership has been removed.");
+  }
 
   return (
     <main className="flex min-h-dvh items-center justify-center px-5">

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import type { Profile } from "@/lib/auth";
 import type {
   Prediction,
   PredictionParticipant,
@@ -185,4 +186,14 @@ export async function getPendingProfiles() {
     .order("created_at");
   if (error) throw new Error(`Could not load members: ${error.message}`);
   return data ?? [];
+}
+
+export async function getProfiles(): Promise<Profile[]> {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("user_id,github_user_id,username,avatar_url,status,is_admin")
+    .order("username");
+  if (error) throw new Error(`Could not load members: ${error.message}`);
+  return (data ?? []) as Profile[];
 }

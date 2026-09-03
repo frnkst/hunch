@@ -21,8 +21,13 @@ function OpenChoiceField({
     (choice) => choice.value === defaultValue,
   );
   const [choiceId, setChoiceId] = useState(
-    defaultChoice?.id ?? question.open_choices[0]?.id ?? "new",
+    defaultChoice ? `existing:${defaultChoice.id}` : "",
   );
+  const [newChoices, setNewChoices] = useState("");
+  const addedChoices = newChoices
+    .split("\n")
+    .map((choice) => choice.trim().replace(/\s+/g, " "))
+    .filter(Boolean);
 
   if (mode === "resolve") {
     return (
@@ -52,31 +57,55 @@ function OpenChoiceField({
 
   return (
     <div className="space-y-2">
+      <label className="block">
+        <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
+          Add options (optional)
+        </span>
+        <textarea
+          name="newChoices"
+          value={newChoices}
+          onChange={(event) => {
+            const value = event.target.value;
+            const optionCount = value
+              .split("\n")
+              .filter((choice) => choice.trim()).length;
+            if (optionCount <= 3) setNewChoices(value);
+          }}
+          maxLength={302}
+          rows={3}
+          className="field resize-none"
+          placeholder={"Your option\nAnother option\nOne more option"}
+        />
+        <span className="mt-1 block text-xs text-[#77708c]">
+          Up to 3 options, one per line.
+        </span>
+      </label>
+      <label className="block">
+        <span className="mb-1.5 block text-xs font-bold text-[#77708c]">
+          Your prediction
+        </span>
       <select
-        name="choiceId"
+        name="choiceSelection"
         value={choiceId}
         onChange={(event) => setChoiceId(event.target.value)}
         required
         className="field"
       >
+        <option value="" disabled>
+          Choose an option…
+        </option>
         {question.open_choices.map((choice) => (
-          <option key={choice.id} value={choice.id}>
+          <option key={choice.id} value={`existing:${choice.id}`}>
             {choice.value}
           </option>
         ))}
-        <option value="new">Add a new choice…</option>
+        {addedChoices.map((choice, index) => (
+          <option key={`${choice}-${index}`} value={`new:${index}`}>
+            {choice} (new)
+          </option>
+        ))}
       </select>
-      {choiceId === "new" ? (
-        <input
-          name="newChoice"
-          type="text"
-          required
-          maxLength={100}
-          className="field"
-          placeholder="Your choice"
-          autoComplete="off"
-        />
-      ) : null}
+      </label>
     </div>
   );
 }

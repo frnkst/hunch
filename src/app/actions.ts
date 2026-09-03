@@ -74,6 +74,25 @@ function parseAnswer(
   return parseLocalDateTime(raw, timezoneOffset).toISOString();
 }
 
+function parseOpenChoices(raw: string, minimum: number): string[] {
+  const choices = raw
+    .split("\n")
+    .map((choice) => choice.trim().replace(/\s+/g, " "))
+    .filter(Boolean);
+  const normalized = choices.map((choice) => choice.toLocaleLowerCase());
+  if (
+    choices.length < minimum ||
+    choices.length > 3 ||
+    choices.some((choice) => [...choice].length > 100) ||
+    new Set(normalized).size !== choices.length
+  ) {
+    throw new Error(
+      `Add ${minimum === 1 ? "1–3" : "up to 3"} unique options, one per line.`,
+    );
+  }
+  return choices;
+}
+
 export async function signInWithGitHub() {
   const config = getAppConfig();
   const supabase = await createServerSupabaseClient();
@@ -128,6 +147,7 @@ export async function createQuestion(formData: FormData) {
   }
 
   let options: string[] | null = null;
+  let openChoiceOptions: string[] = [];
   if (type === "multiple_choice") {
     options = String(formData.get("options") ?? "")
       .split("\n")
@@ -139,6 +159,16 @@ export async function createQuestion(formData: FormData) {
       new Set(options).size !== options.length
     ) {
       fail(path, "Add 2–10 unique options, one per line.");
+    }
+  }
+  if (type === "open_choice") {
+    try {
+      openChoiceOptions = parseOpenChoices(
+        String(formData.get("openChoiceOptions") ?? ""),
+        1,
+      );
+    } catch (error) {
+      fail(path, error instanceof Error ? error.message : "Invalid options.");
     }
   }
 
@@ -157,6 +187,19 @@ export async function createQuestion(formData: FormData) {
     .select("id")
     .single();
   if (error) fail(path, `Could not create question: ${error.message}`);
+  if (type === "open_choice") {
+    const { error: choicesError } = await admin.from("question_choices").insert(
+      openChoiceOptions.map((value) => ({
+        question_id: data.id,
+        value,
+        created_by: user.id,
+      })),
+    );
+    if (choicesError) {
+      await admin.from("questions").delete().eq("id", data.id);
+      fail(path, `Could not add options: ${choicesError.message}`);
+    }
+  }
   redirect(`/questions/${data.id}`);
 }
 
@@ -178,15 +221,33 @@ export async function savePrediction(formData: FormData) {
   }
 
   if (data.type === "open_choice") {
-    const choiceId = String(formData.get("choiceId") ?? "");
-    let newChoiceValue: string | null = null;
-    if (choiceId === "new") {
-      newChoiceValue = String(formData.get("newChoice") ?? "")
-        .trim()
-        .replace(/\s+/g, " ");
-      if (!newChoiceValue || [...newChoiceValue].length > 100) {
-        fail(path, "Enter a choice between 1 and 100 characters.");
-      }
+    const selection = String(formData.get("choiceSelection") ?? "");
+    let newChoices: string[] = [];
+    try {
+      newChoices = parseOpenChoices(
+        String(formData.get("newChoices") ?? ""),
+        0,
+      );
+    } catch (parseError) {
+      fail(
+        path,
+        parseError instanceof Error ? parseError.message : "Invalid options.",
+      );
+    }
+    const existingChoiceId = selection.startsWith("existing:")
+      ? selection.slice("existing:".length)
+      : null;
+    const selectedNewIndex = selection.startsWith("new:")
+      ? Number(selection.slice("new:".length))
+      : null;
+    if (
+      (!existingChoiceId && selectedNewIndex === null) ||
+      (selectedNewIndex !== null &&
+        (!Number.isInteger(selectedNewIndex) ||
+          selectedNewIndex < 0 ||
+          selectedNewIndex >= newChoices.length))
+    ) {
+      fail(path, "Choose a valid option.");
     }
 
     const { error: saveError } = await admin.rpc(
@@ -194,8 +255,9 @@ export async function savePrediction(formData: FormData) {
       {
         target_question_id: questionId,
         target_user_id: user.id,
-        target_choice_id: choiceId === "new" ? null : choiceId,
-        new_choice_value: newChoiceValue,
+        target_choice_id: existingChoiceId,
+        new_choice_values: newChoices,
+        target_selected_new_index: selectedNewIndex,
       },
     );
     if (saveError) {
@@ -480,4 +542,32 @@ export async function approveMember(formData: FormData) {
   if (error) fail("/admin", error.message);
   revalidatePath("/admin");
   redirect("/admin?approved=1");
+}
+
+export async function removeMember(formData: FormData) {
+  const membership = await requireAdmin();
+  const userId = String(formData.get("userId") ?? "");
+  if (userId === membership.user.id) {
+    fail("/admin", "You cannot remove your own membership.");
+  }
+  const admin = createAdminSupabaseClient();
+  const { data, error } = await admin
+    .from("profiles")
+    .update({
+      username: "Removed user",
+      avatar_url: null,
+      status: "removed",
+      is_admin: false,
+    })
+    .eq("user_id", userId)
+    .eq("is_admin", false)
+    .neq("status", "removed")
+    .select("user_id")
+    .maybeSingle();
+  if (error) fail("/admin", error.message);
+  if (!data) fail("/admin", "This member cannot be removed.");
+  revalidatePath("/");
+  revalidatePath("/admin");
+  revalidatePath("/leaderboard");
+  redirect("/admin?removed=1");
 }

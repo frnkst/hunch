@@ -10,7 +10,7 @@ export type Profile = {
   github_user_id: string;
   username: string;
   avatar_url: string | null;
-  status: "pending" | "approved";
+  status: "pending" | "approved" | "removed";
   is_admin: boolean;
 };
 
@@ -40,6 +40,9 @@ export async function getMembership(): Promise<Membership | null> {
 export async function requireMembership(): Promise<Membership> {
   const membership = await getMembership();
   if (!membership) redirect("/login");
+  if (membership.profile.status === "removed") {
+    redirect("/login?error=This membership has been removed.");
+  }
   if (membership.profile.status !== "approved") redirect("/pending");
   return membership;
 }

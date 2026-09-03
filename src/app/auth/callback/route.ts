@@ -55,12 +55,26 @@ export async function GET(request: NextRequest) {
   }
 
   const admin = createAdminSupabaseClient();
-  const { data: existing } = await admin
-    .from("profiles")
-    .select("status")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const [{ data: existing }, { data: removedIdentity }] = await Promise.all([
+    admin
+      .from("profiles")
+      .select("status")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    admin
+      .from("profiles")
+      .select("user_id")
+      .eq("github_user_id", githubUserId)
+      .eq("status", "removed")
+      .maybeSingle(),
+  ]);
   const isAdmin = githubUserId === config.adminGitHubUserId;
+  if (existing?.status === "removed" || removedIdentity) {
+    await supabase.auth.signOut();
+    return NextResponse.redirect(
+      new URL("/login?error=This%20membership%20has%20been%20removed.", config.appUrl),
+    );
+  }
   const { error: profileError } = await admin.from("profiles").upsert({
     user_id: user.id,
     github_user_id: githubUserId,

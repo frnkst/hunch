@@ -13,7 +13,7 @@ export default async function LoginPage({
 }) {
   const membership = await getMembership();
   if (membership?.profile.status === "approved") redirect("/");
-  if (membership) redirect("/pending");
+  if (membership?.profile.status === "pending") redirect("/pending");
   const { error } = await searchParams;
 
   return (

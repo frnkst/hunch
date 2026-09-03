@@ -48,12 +48,23 @@ export function QuestionForm() {
             </option>
           ))}
         </select>
-        {type === "open_choice" ? (
-          <span className="mt-1.5 block text-xs text-[#77708c]">
-            Predictors can add choices for everyone else to reuse.
-          </span>
-        ) : null}
       </label>
+
+      {type === "open_choice" ? (
+        <label className="block">
+          <span className="mb-2 block text-sm font-bold">Starting options</span>
+          <textarea
+            name="openChoiceOptions"
+            required
+            rows={3}
+            className="field resize-none"
+            placeholder={"Option one\nOption two\nOption three"}
+          />
+          <span className="mt-1.5 block text-xs text-[#77708c]">
+            Add 1–3 options, one per line. Predictors can add up to three more.
+          </span>
+        </label>
+      ) : null}
 
       {type === "multiple_choice" ? (
         <label className="block">
