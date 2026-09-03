@@ -17,6 +17,7 @@ function question(
     text: `Question ${id}`,
     type: "boolean",
     options: null,
+    open_choices: [],
     deadline,
     visibility: "after_deadline",
     reward: null,

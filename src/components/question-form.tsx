@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { createQuestion } from "@/app/actions";
 import { DateTimeField } from "@/components/date-time-field";
-import { visibilityLabels } from "@/lib/format";
+import { typeLabels, visibilityLabels } from "@/lib/format";
 import {
   questionTypes,
   type QuestionType,
@@ -12,7 +12,7 @@ import {
 } from "@/lib/types";
 
 export function QuestionForm() {
-  const [type, setType] = useState<QuestionType>("boolean");
+  const [type, setType] = useState<QuestionType>("open_choice");
 
   return (
     <form action={createQuestion} className="space-y-5">
@@ -44,16 +44,15 @@ export function QuestionForm() {
         >
           {questionTypes.map((value) => (
             <option key={value} value={value}>
-              {value === "boolean"
-                ? "Yes / no"
-                : value === "multiple_choice"
-                  ? "Multiple choice"
-                  : value === "datetime"
-                    ? "Date & time"
-                    : value[0].toUpperCase() + value.slice(1)}
+              {typeLabels[value]}
             </option>
           ))}
         </select>
+        {type === "open_choice" ? (
+          <span className="mt-1.5 block text-xs text-[#77708c]">
+            Predictors can add choices for everyone else to reuse.
+          </span>
+        ) : null}
       </label>
 
       {type === "multiple_choice" ? (

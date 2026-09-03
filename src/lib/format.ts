@@ -1,6 +1,7 @@
 import type { QuestionType, VisibilityMode } from "@/lib/types";
 
 export const typeLabels: Record<QuestionType, string> = {
+  open_choice: "Open choice",
   boolean: "Yes / no",
   multiple_choice: "Multiple choice",
   number: "Number",

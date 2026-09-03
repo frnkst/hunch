@@ -19,6 +19,22 @@ describe("scorePredictions", () => {
     ]);
   });
 
+  it("scores open-choice predictions as correct or incorrect", () => {
+    expect(
+      scorePredictions(
+        "open_choice",
+        [
+          { id: "a", answer: "Paris" },
+          { id: "b", answer: "Rome" },
+        ],
+        "Paris",
+      ),
+    ).toEqual([
+      { id: "a", answer: "Paris", points: 10 },
+      { id: "b", answer: "Rome", points: 0 },
+    ]);
+  });
+
   it("distributes numeric points by proportional rank", () => {
     expect(
       scorePredictions(

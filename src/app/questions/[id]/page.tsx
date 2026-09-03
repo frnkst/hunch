@@ -5,6 +5,7 @@ import {
   Eye,
   Gift,
   Hourglass,
+  MinusCircle,
   Users,
 } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -52,6 +53,8 @@ export default async function QuestionPage({
     (mayManage && question.status === "open" && deadlinePassed) ||
     (membership.profile.is_admin && question.status === "resolved");
   const mayPredict = question.status === "open" && !deadlinePassed;
+  const noOutcome =
+    question.status === "resolved" && question.correct_answer === null;
   const ownPrediction = predictions.find(
     (prediction) => prediction.user_id === membership.user.id,
   );
@@ -68,7 +71,9 @@ export default async function QuestionPage({
           query.saved
             ? "Your hunch is saved."
             : query.resolved
-              ? "Outcome set and points awarded."
+              ? noOutcome
+                ? "No outcome recorded. No points were awarded."
+                : "Outcome set and points awarded."
               : query.updated
                 ? "Settings updated."
                 : undefined
@@ -140,6 +145,18 @@ export default async function QuestionPage({
           </div>
         ) : null}
 
+        {noOutcome ? (
+          <div className="mt-6 flex items-start gap-3 rounded-[1.25rem] bg-amber-50 p-4 text-amber-800">
+            <MinusCircle className="mt-0.5 size-5 shrink-0" />
+            <div>
+              <p className="eyebrow">No outcome</p>
+              <p className="mt-1 text-sm font-semibold">
+                There is no winner, and no points were awarded.
+              </p>
+            </div>
+          </div>
+        ) : null}
+
         {question.status === "cancelled" ? (
           <div className="mt-6 flex items-center gap-3 rounded-[1.25rem] bg-rose-50 p-4 text-sm font-semibold text-rose-700">
             <Ban className="size-5" />
@@ -192,7 +209,9 @@ export default async function QuestionPage({
                     </div>
                     {question.status === "resolved" && prediction ? (
                       <span className="rounded-full bg-violet-100 px-2.5 py-1 text-xs font-black text-violet-700">
-                        {Number(prediction.points ?? 0)} pts
+                        {noOutcome
+                          ? "No points"
+                          : `${Number(prediction.points ?? 0)} pts`}
                       </span>
                     ) : null}
                   </li>
@@ -229,8 +248,8 @@ export default async function QuestionPage({
                   : "Set the outcome"}
               </h2>
               <p className="mb-3 mt-1 text-xs leading-5 text-[#77708c]">
-                This immediately scores every prediction and updates the
-                leaderboard.
+                Choose the actual outcome to score predictions, or record no
+                outcome when there should be no winner or points.
               </p>
               <AnswerForm question={question} mode="resolve" />
             </section>

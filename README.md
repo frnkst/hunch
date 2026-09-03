@@ -9,10 +9,11 @@ Habitz.
 ## Features
 
 - GitHub OAuth with admin approval for new members
-- Yes/no, multiple-choice, number, date, and date-time predictions
+- Open-choice, yes/no, multiple-choice, number, date, and date-time predictions
 - Creator-set deadlines and prediction visibility
 - Editable predictions until the deadline
 - Creator resolution, admin override, and question cancellation
+- No-outcome resolution with no winner or leaderboard points
 - 10/0 scoring for categorical questions
 - Proportional 10-to-0 rank scoring for number and date questions, with tied
   ranks sharing their occupied points

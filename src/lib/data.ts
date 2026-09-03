@@ -10,6 +10,9 @@ import type {
 function normalizeQuestion(row: Record<string, unknown>): Question {
   return {
     ...(row as unknown as Question),
+    open_choices: Array.isArray(row.open_choices)
+      ? (row.open_choices as Question["open_choices"])
+      : [],
     creator: Array.isArray(row.creator)
       ? (row.creator[0] as Question["creator"])
       : (row.creator as Question["creator"]),
@@ -49,6 +52,7 @@ export async function getQuestion(questionId: string): Promise<{
     { data: questionRow, error: questionError },
     predictionsResult,
     participantsResult,
+    choicesResult,
   ] = await Promise.all([
     supabase
       .from("questions")
@@ -68,6 +72,11 @@ export async function getQuestion(questionId: string): Promise<{
     supabase.rpc("list_prediction_participants", {
       target_question_id: questionId,
     }),
+    supabase
+      .from("question_choices")
+      .select("id,value")
+      .eq("question_id", questionId)
+      .order("created_at"),
   ]);
   if (questionError) {
     throw new Error(`Could not load question: ${questionError.message}`);
@@ -82,9 +91,18 @@ export async function getQuestion(questionId: string): Promise<{
       `Could not load prediction participants: ${participantsResult.error.message}`,
     );
   }
+  if (choicesResult.error) {
+    throw new Error(`Could not load choices: ${choicesResult.error.message}`);
+  }
+  const question = questionRow
+    ? normalizeQuestion(questionRow as Record<string, unknown>)
+    : null;
   return {
-    question: questionRow
-      ? normalizeQuestion(questionRow as Record<string, unknown>)
+    question: question
+      ? {
+          ...question,
+          open_choices: (choicesResult.data ?? []) as Question["open_choices"],
+        }
       : null,
     predictions: (predictionsResult.data ?? []).map((row) =>
       normalizePrediction(row as Record<string, unknown>),

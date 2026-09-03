@@ -1,4 +1,5 @@
 export const questionTypes = [
+  "open_choice",
   "boolean",
   "multiple_choice",
   "number",
@@ -13,12 +14,18 @@ export const visibilityModes = [
 ] as const;
 export type VisibilityMode = (typeof visibilityModes)[number];
 
+export type OpenChoice = {
+  id: string;
+  value: string;
+};
+
 export type Question = {
   id: string;
   creator_id: string;
   text: string;
   type: QuestionType;
   options: string[] | null;
+  open_choices: OpenChoice[];
   deadline: string;
   visibility: VisibilityMode;
   reward: string | null;

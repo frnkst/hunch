@@ -54,6 +54,10 @@ function parseAnswer(
     if (!options?.includes(raw)) throw new Error("Choose a valid option.");
     return raw;
   }
+  if (type === "open_choice") {
+    if (!options?.includes(raw)) throw new Error("Choose a valid choice.");
+    return raw;
+  }
   if (type === "number") {
     const value = Number(raw);
     if (!raw.trim() || !Number.isFinite(value)) {
@@ -173,6 +177,34 @@ export async function savePrediction(formData: FormData) {
     fail(path, "Predictions are closed.");
   }
 
+  if (data.type === "open_choice") {
+    const choiceId = String(formData.get("choiceId") ?? "");
+    let newChoiceValue: string | null = null;
+    if (choiceId === "new") {
+      newChoiceValue = String(formData.get("newChoice") ?? "")
+        .trim()
+        .replace(/\s+/g, " ");
+      if (!newChoiceValue || [...newChoiceValue].length > 100) {
+        fail(path, "Enter a choice between 1 and 100 characters.");
+      }
+    }
+
+    const { error: saveError } = await admin.rpc(
+      "save_open_choice_prediction",
+      {
+        target_question_id: questionId,
+        target_user_id: user.id,
+        target_choice_id: choiceId === "new" ? null : choiceId,
+        new_choice_value: newChoiceValue,
+      },
+    );
+    if (saveError) {
+      fail(path, `Could not save prediction: ${saveError.message}`);
+    }
+    revalidatePath(path);
+    redirect(`${path}?saved=1`);
+  }
+
   let answer: string | number | boolean;
   try {
     answer = parseAnswer(
@@ -231,43 +263,74 @@ export async function resolveQuestion(formData: FormData) {
     fail(path, "This question cannot be resolved before its deadline.");
   }
 
-  let correctAnswer: string | number | boolean;
-  try {
-    correctAnswer = parseAnswer(
-      question.type,
-      String(formData.get("answer") ?? ""),
-      question.options,
-      timezoneOffset,
-    );
-  } catch (parseError) {
-    fail(
-      path,
-      parseError instanceof Error
-        ? parseError.message
-        : "Invalid correct answer.",
-    );
+  const resolution = String(formData.get("resolution") ?? "answer");
+  if (resolution !== "answer" && resolution !== "no_outcome") {
+    fail(path, "Choose a valid outcome.");
+  }
+  const noOutcome = resolution === "no_outcome";
+  let correctAnswer: string | number | boolean | null = null;
+  if (!noOutcome) {
+    let answerOptions = question.options;
+    if (question.type === "open_choice") {
+      const { data: choices, error: choicesError } = await admin
+        .from("question_choices")
+        .select("value")
+        .eq("question_id", questionId);
+      if (choicesError) fail(path, choicesError.message);
+      answerOptions = (choices ?? []).map((choice) => choice.value);
+    }
+    try {
+      correctAnswer = parseAnswer(
+        question.type,
+        String(formData.get("answer") ?? ""),
+        answerOptions,
+        timezoneOffset,
+      );
+    } catch (parseError) {
+      fail(
+        path,
+        parseError instanceof Error
+          ? parseError.message
+          : "Invalid correct answer.",
+      );
+    }
   }
 
-  const { data: predictionRows, error: predictionError } = await admin
-    .from("predictions")
-    .select("id,answer")
-    .eq("question_id", questionId);
-  if (predictionError) fail(path, predictionError.message);
-
-  const scores = scorePredictions(
-    question.type,
-    (predictionRows ?? []) as Array<{
-      id: string;
-      answer: string | number | boolean;
-    }>,
-    correctAnswer,
-  );
-  for (const score of scores) {
-    const { error: scoreError } = await admin
+  if (noOutcome) {
+    const { error: clearScoreError } = await admin
       .from("predictions")
-      .update({ points: score.points })
-      .eq("id", score.id);
-    if (scoreError) fail(path, `Could not score predictions: ${scoreError.message}`);
+      .update({ points: null })
+      .eq("question_id", questionId);
+    if (clearScoreError) {
+      fail(path, `Could not clear prediction scores: ${clearScoreError.message}`);
+    }
+  } else {
+    if (correctAnswer === null) {
+      fail(path, "Choose a valid outcome.");
+    }
+    const { data: predictionRows, error: predictionError } = await admin
+      .from("predictions")
+      .select("id,answer")
+      .eq("question_id", questionId);
+    if (predictionError) fail(path, predictionError.message);
+
+    const scores = scorePredictions(
+      question.type,
+      (predictionRows ?? []) as Array<{
+        id: string;
+        answer: string | number | boolean;
+      }>,
+      correctAnswer,
+    );
+    for (const score of scores) {
+      const { error: scoreError } = await admin
+        .from("predictions")
+        .update({ points: score.points })
+        .eq("id", score.id);
+      if (scoreError) {
+        fail(path, `Could not score predictions: ${scoreError.message}`);
+      }
+    }
   }
 
   const { error: resolutionError } = await admin

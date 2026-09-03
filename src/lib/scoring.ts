@@ -31,7 +31,11 @@ export function scorePredictions(
   }>,
   correctAnswer: string | number | boolean,
 ): ScoredPrediction[] {
-  if (type === "boolean" || type === "multiple_choice") {
+  if (
+    type === "boolean" ||
+    type === "multiple_choice" ||
+    type === "open_choice"
+  ) {
     return predictions.map((prediction) => ({
       ...prediction,
       points: prediction.answer === correctAnswer ? 10 : 0,
